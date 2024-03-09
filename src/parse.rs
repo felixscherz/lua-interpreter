@@ -1,5 +1,5 @@
-use std::{fmt, fs::File};
-use crate::{lex::{Lex, Token}, value::Value, vm::ExeState};
+use std::{fs::File};
+use crate::{lex::{Lex, Token}, value::Value};
 use crate::bytecode::ByteCode;
 
 
