@@ -1,4 +1,7 @@
-use std::{fs::File, io::{Read, Seek, SeekFrom}};
+use std::{
+    fs::File,
+    io::{Read, Seek, SeekFrom},
+};
 
 #[derive(Debug, PartialEq)]
 pub enum Token {
@@ -131,10 +134,9 @@ impl Lex {
                 }
                 Token::Name(str)
             }
-            _ => panic!("Unexpected char in lexer")
+            _ => panic!("Unexpected char in lexer"),
         }
     }
-
 
     fn read_char(&mut self) -> char {
         let mut buf: [u8; 1] = [0];

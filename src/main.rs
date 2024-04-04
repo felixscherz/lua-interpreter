@@ -2,10 +2,10 @@ use std::env;
 use std::fs::File;
 use std::io::stdout;
 
-mod value;
 mod bytecode;
 mod lex;
 mod parse;
+mod value;
 mod vm;
 
 fn main() {

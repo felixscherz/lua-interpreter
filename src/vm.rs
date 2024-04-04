@@ -7,18 +7,18 @@ use std::io::{Stdout, Write};
 pub struct ExeState<'a> {
     globals: HashMap<String, Value>,
     stack: Vec<Value>,
-    stdout: &'a mut  (dyn Write + 'a),
+    output: &'a mut (dyn Write + 'a),
 }
 
-impl <'a> ExeState<'a> {
-    pub fn new(stdout: &'a mut (dyn Write + 'a)) -> Self {
+impl<'a> ExeState<'a> {
+    pub fn new(output: &'a mut (dyn Write + 'a)) -> Self {
         let mut globals = HashMap::new();
         globals.insert(String::from("print"), Value::Function(lib_print));
 
         ExeState {
             globals,
             stack: Vec::new(),
-            stdout,
+            output,
         }
     }
 
@@ -63,6 +63,6 @@ impl <'a> ExeState<'a> {
 // "print" function in Lua's std-lib.
 // It supports only 1 argument and assumes the argument is at index:1 on stack.
 fn lib_print(state: &mut ExeState) -> i32 {
-    writeln!(state.stdout, "{:?}", state.stack[1]).unwrap();
+    writeln!(state.output, "{:?}", state.stack[1]).unwrap();
     0
 }

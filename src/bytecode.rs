@@ -4,4 +4,3 @@ pub enum ByteCode {
     LoadConst(u8, u8),
     Call(u8, u8),
 }
-
