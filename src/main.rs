@@ -17,5 +17,5 @@ fn main() {
     let file = File::open(&args[1]).unwrap();
 
     let proto = parse::load(file);
-    vm::ExeState::new(stdout()).execute(&proto);
+    vm::ExeState::new(&mut stdout()).execute(&proto);
 }

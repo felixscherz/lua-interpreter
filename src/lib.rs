@@ -6,7 +6,8 @@ mod lex;
 mod parse;
 mod vm;
 
-pub fn lua(input: File, stdout: Stdout) {
+pub fn lua(input: File, mut stdout: Stdout) {
     let proto = parse::load(input);
-    vm::ExeState::new(stdout).execute(&proto);
+
+    vm::ExeState::new(&mut stdout).execute(&proto);
 }

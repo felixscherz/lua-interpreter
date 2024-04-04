@@ -4,14 +4,14 @@ use crate::value::Value;
 use std::collections::HashMap;
 use std::io::{Stdout, Write};
 
-pub struct ExeState {
+pub struct ExeState<'a> {
     globals: HashMap<String, Value>,
     stack: Vec<Value>,
-    stdout: Stdout,
+    stdout: &'a mut  (dyn Write + 'a),
 }
 
-impl ExeState {
-    pub fn new(stdout: Stdout) -> Self {
+impl <'a> ExeState<'a> {
+    pub fn new(stdout: &'a mut (dyn Write + 'a)) -> Self {
         let mut globals = HashMap::new();
         globals.insert(String::from("print"), Value::Function(lib_print));
 
@@ -63,7 +63,6 @@ impl ExeState {
 // "print" function in Lua's std-lib.
 // It supports only 1 argument and assumes the argument is at index:1 on stack.
 fn lib_print(state: &mut ExeState) -> i32 {
-    let mut stdout = state.stdout.lock();
-    writeln!(stdout, "{:?}", state.stack[1]).unwrap();
+    writeln!(state.stdout, "{:?}", state.stack[1]).unwrap();
     0
 }
