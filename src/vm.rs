@@ -2,25 +2,33 @@ use crate::bytecode::ByteCode;
 use crate::parse::ParseProto;
 use crate::value::Value;
 use std::collections::HashMap;
+use std::io::{Stdout, Write};
 
 pub struct ExeState {
     globals: HashMap<String, Value>,
     stack: Vec<Value>,
+    stdout: Stdout,
 }
 
 impl ExeState {
-    pub fn new() -> Self {
+    pub fn new(stdout: Stdout) -> Self {
         let mut globals = HashMap::new();
         globals.insert(String::from("print"), Value::Function(lib_print));
 
         ExeState {
             globals,
             stack: Vec::new(),
+            stdout,
         }
     }
 
     fn set_stack(&mut self, dst: u8, c: Value) {
-        self.stack.insert(dst.into(), c);
+        let dst: usize = dst.into();
+        match dst.cmp(&self.stack.len()) {
+            std::cmp::Ordering::Less => self.stack[dst] = c,
+            std::cmp::Ordering::Equal => self.stack.push(c),
+            std::cmp::Ordering::Greater => panic!("failed to set_stack"),
+        }
     }
 
     pub fn execute(&mut self, proto: &ParseProto) {
@@ -55,6 +63,7 @@ impl ExeState {
 // "print" function in Lua's std-lib.
 // It supports only 1 argument and assumes the argument is at index:1 on stack.
 fn lib_print(state: &mut ExeState) -> i32 {
-    println!("{:?}", state.stack[1]);
+    let mut stdout = state.stdout.lock();
+    writeln!(stdout, "{:?}", state.stack[1]).unwrap();
     0
 }
