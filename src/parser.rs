@@ -11,10 +11,10 @@ pub struct ParseProto {
     pub byte_codes: Vec<ByteCode>,
 }
 
-pub fn load(input: File) -> ParseProto {
+pub fn load(stream: File) -> ParseProto {
     let mut constants = Vec::new();
     let mut byte_codes = Vec::new();
-    let mut lex = Lex::new(input);
+    let mut lex = Lex::new(stream);
 
     loop {
         match lex.next() {

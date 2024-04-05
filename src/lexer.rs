@@ -82,16 +82,16 @@ pub enum Token {
 
 #[derive(Debug)]
 pub struct Lex {
-    input: File,
+    stream: File,
 }
 
 impl Lex {
-    pub fn new(input: File) -> Self {
-        Self { input }
+    pub fn new(stream: File) -> Self {
+        Self { stream }
     }
 
     fn seek(&mut self, n: i64) {
-        self.input.seek(SeekFrom::Current(n)).unwrap();
+        self.stream.seek(SeekFrom::Current(n)).unwrap();
     }
 
     pub fn next(&mut self) -> Token {
@@ -140,7 +140,7 @@ impl Lex {
 
     fn read_char(&mut self) -> char {
         let mut buf: [u8; 1] = [0];
-        if self.input.read(&mut buf).unwrap() == 1 {
+        if self.stream.read(&mut buf).unwrap() == 1 {
             buf[0] as char
         } else {
             '\0' // null-byte signifies end of file
