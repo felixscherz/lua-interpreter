@@ -1,6 +1,5 @@
 use std::{
-    fs::File,
-    io::{Read, Seek, SeekFrom},
+    fmt::Debug, fs::File, io::{Read, Seek, SeekFrom}
 };
 
 #[derive(Debug, PartialEq)]
@@ -80,13 +79,16 @@ pub enum Token {
     Eos,
 }
 
+pub trait SeekRead: Seek + Read + Debug {}
+impl<T> SeekRead for T where T: Seek + Read + Debug {}
+
 #[derive(Debug)]
-pub struct Lex {
-    stream: File,
+pub struct Lex<'a> {
+    stream: &'a mut (dyn SeekRead + 'a),
 }
 
-impl Lex {
-    pub fn new(stream: File) -> Self {
+impl<'a> Lex<'a> {
+    pub fn new(stream: &'a mut (dyn SeekRead + 'a)) -> Self {
         Self { stream }
     }
 

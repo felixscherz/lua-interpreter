@@ -11,7 +11,7 @@ fn test_hello_world() {
 
     let mut output = tempfile().unwrap();
 
-    lua(file, &mut output);
+    lua(&mut file, &mut output);
     let mut buffer = String::new();
     output.seek(io::SeekFrom::Start(0)).unwrap();
     output.read_to_string(&mut buffer).unwrap();

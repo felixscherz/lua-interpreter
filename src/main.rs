@@ -14,8 +14,8 @@ fn main() {
         println!("Usage: {} script", args[0]);
         return;
     }
-    let file = File::open(&args[1]).unwrap();
+    let mut file = File::open(&args[1]).unwrap();
 
-    let proto = parser::load(file);
+    let proto = parser::load(&mut file);
     vm::ExeState::new(&mut stdout()).execute(&proto);
 }
