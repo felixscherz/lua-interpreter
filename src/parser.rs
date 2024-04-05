@@ -1,6 +1,6 @@
 use crate::bytecode::ByteCode;
 use crate::{
-    lex::{Lex, Token},
+    lexer::{Lex, Token},
     value::Value,
 };
 use std::fs::File;

@@ -3,8 +3,8 @@ use std::fs::File;
 use std::io::stdout;
 
 mod bytecode;
-mod lex;
-mod parse;
+mod lexer;
+mod parser;
 mod value;
 mod vm;
 
@@ -16,6 +16,6 @@ fn main() {
     }
     let file = File::open(&args[1]).unwrap();
 
-    let proto = parse::load(file);
+    let proto = parser::load(file);
     vm::ExeState::new(&mut stdout()).execute(&proto);
 }

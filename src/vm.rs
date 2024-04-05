@@ -1,5 +1,5 @@
 use crate::bytecode::ByteCode;
-use crate::parse::ParseProto;
+use crate::parser::ParseProto;
 use crate::value::Value;
 use std::collections::HashMap;
 use std::io::{Stdout, Write};
