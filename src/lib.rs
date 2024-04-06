@@ -1,6 +1,6 @@
 use std::{
     fs::File,
-    io::{Stdout, Write},
+    io::{Write},
 };
 
 mod bytecode;

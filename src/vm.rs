@@ -2,7 +2,7 @@ use crate::bytecode::ByteCode;
 use crate::parser::ParseProto;
 use crate::value::Value;
 use std::collections::HashMap;
-use std::io::{Stdout, Write};
+use std::io:: Write;
 
 pub struct ExeState<'a> {
     globals: HashMap<String, Value>,
