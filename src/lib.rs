@@ -1,7 +1,4 @@
-use std::{
-    fs::File,
-    io::{Write},
-};
+use std::{fs::File, io::Write};
 
 mod bytecode;
 mod lexer;
