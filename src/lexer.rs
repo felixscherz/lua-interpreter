@@ -1,5 +1,7 @@
 use std::{
-    fmt::Debug, fs::File, io::{Read, Seek, SeekFrom}
+    fmt::Debug,
+    fs::File,
+    io::{Read, Seek, SeekFrom},
 };
 
 #[derive(Debug, PartialEq)]
@@ -147,5 +149,13 @@ impl<'a> Lex<'a> {
         } else {
             '\0' // null-byte signifies end of file
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_hello() {
+        assert!(true)
     }
 }
