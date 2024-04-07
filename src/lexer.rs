@@ -1,9 +1,9 @@
 use std::{
     fmt::Debug,
-    fs::File,
     io::{Read, Seek, SeekFrom},
 };
 
+#[allow(dead_code)]
 #[derive(Debug, PartialEq)]
 pub enum Token {
     // keywords
@@ -154,20 +154,16 @@ impl<'a> Lexer<'a> {
 
 #[cfg(test)]
 mod tests {
-    use std::{
-        fmt::Write,
-        io::{BufReader, Cursor},
-    };
-
     use super::*;
-    use crate::lexer::Lexer;
-
+    #[allow(unused_imports)]
+    use super::*;
+    use std::io::Cursor;
     #[test]
     fn test_hello() {
         let code = "print \"hello world!\"".to_string();
         let mut cursor = Cursor::new(code);
-        let mut lex = Lexer::new(&mut cursor);
-        let token = lex.next();
+        let mut lexer = Lexer::new(&mut cursor);
+        let token = lexer.next();
         assert_eq!(token, Token::Name("print".to_string()))
     }
 }
