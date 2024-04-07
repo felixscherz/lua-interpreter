@@ -85,11 +85,11 @@ pub trait SeekRead: Seek + Read + Debug {}
 impl<T> SeekRead for T where T: Seek + Read + Debug {}
 
 #[derive(Debug)]
-pub struct Lex<'a> {
+pub struct Lexer<'a> {
     stream: &'a mut (dyn SeekRead + 'a),
 }
 
-impl<'a> Lex<'a> {
+impl<'a> Lexer<'a> {
     pub fn new(stream: &'a mut (dyn SeekRead + 'a)) -> Self {
         Self { stream }
     }
@@ -154,8 +154,20 @@ impl<'a> Lex<'a> {
 
 #[cfg(test)]
 mod tests {
+    use std::{
+        fmt::Write,
+        io::{BufReader, Cursor},
+    };
+
+    use super::*;
+    use crate::lexer::Lexer;
+
     #[test]
     fn test_hello() {
-        assert!(true)
+        let code = "print \"hello world!\"".to_string();
+        let mut cursor = Cursor::new(code);
+        let mut lex = Lexer::new(&mut cursor);
+        let token = lex.next();
+        assert_eq!(token, Token::Name("print".to_string()))
     }
 }

@@ -1,6 +1,6 @@
 use crate::bytecode::ByteCode;
 use crate::{
-    lexer::{Lex, Token},
+    lexer::{Lexer, Token},
     value::Value,
 };
 use std::fs::File;
@@ -14,7 +14,7 @@ pub struct ParseProto {
 pub fn load(stream: &mut File) -> ParseProto {
     let mut constants = Vec::new();
     let mut byte_codes = Vec::new();
-    let mut lex = Lex::new(stream);
+    let mut lex = Lexer::new(stream);
 
     loop {
         match lex.next() {
