@@ -118,6 +118,27 @@ impl<'a> Lexer<'a> {
                 self.seek(-1);
                 self.read_word()
             }
+            '0'..='9' => {
+                let mut str = c.to_string();
+                let mut is_float = false;
+                loop {
+                    let c = self.read_char();
+                    match c {
+                        '0'..='9' => str.push(c),
+                        '.' => {
+                            is_float = true;
+                            str.push(c)
+                        }
+                        _ => break,
+                    }
+                }
+                if is_float {
+                    Token::Float(str.parse().unwrap())
+                } else {
+                    Token::Integer(str.parse().unwrap())
+                }
+            }
+            '=' => Token::Assign,
             _ => panic!("Unexpected char in lexer"),
         }
     }
@@ -174,13 +195,36 @@ mod tests {
     #[allow(unused_imports)]
     use super::*;
     use std::io::Cursor;
+
     #[test]
-    fn test_hello() {
+    fn test_print_hello_world() {
         let code = "print \"hello world!\"".to_string();
         let mut cursor = Cursor::new(code);
         let mut lexer = Lexer::new(&mut cursor);
         assert_eq!(lexer.next(), Token::Name("print".to_string()));
         assert_eq!(lexer.next(), Token::String("hello world!".to_string()));
         assert_eq!(lexer.next(), Token::Eos);
+    }
+
+    #[test]
+    fn test_parse_integer() {
+        let code = "local a = 0".to_string();
+        let mut cursor = Cursor::new(code);
+        let mut lexer = Lexer::new(&mut cursor);
+        assert_eq!(lexer.next(), Token::Local);
+        assert_eq!(lexer.next(), Token::Name("a".to_string()));
+        assert_eq!(lexer.next(), Token::Assign);
+        assert_eq!(lexer.next(), Token::Integer(0));
+    }
+
+    #[test]
+    fn test_parse_float() {
+        let code = "local a = 0.5".to_string();
+        let mut cursor = Cursor::new(code);
+        let mut lexer = Lexer::new(&mut cursor);
+        assert_eq!(lexer.next(), Token::Local);
+        assert_eq!(lexer.next(), Token::Name("a".to_string()));
+        assert_eq!(lexer.next(), Token::Assign);
+        assert_eq!(lexer.next(), Token::Float(0.5));
     }
 }
