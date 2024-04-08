@@ -103,19 +103,6 @@ impl<'a> Lexer<'a> {
         match c {
             '\0' => Token::Eos,
             ' ' | '\n' | '\t' | '\r' => self.next(),
-            'a' => {
-                if let 'n' = self.read_char() {
-                    if let 'd' = self.read_char() {
-                        Token::And
-                    } else {
-                        self.seek(-1);
-                        self.next()
-                    }
-                } else {
-                    self.seek(-1);
-                    self.next()
-                }
-            }
             '"' => {
                 let mut str = String::new();
                 loop {
@@ -128,17 +115,46 @@ impl<'a> Lexer<'a> {
                 Token::String(str)
             }
             'A'..='Z' | 'a'..='z' | '_' => {
-                let mut str = c.to_string();
-                loop {
-                    let c = self.read_char();
-                    if c == ' ' {
-                        break;
-                    }
-                    str.push(c);
-                }
-                Token::Name(str)
+                self.seek(-1);
+                self.read_word()
             }
             _ => panic!("Unexpected char in lexer"),
+        }
+    }
+
+    fn read_word(&mut self) -> Token {
+        let mut word = String::new();
+        loop {
+            let c = self.read_char();
+            if c == ' ' {
+                break;
+            }
+            word.push(c);
+        }
+        match word.as_str() {
+            "and" => Token::And,
+            "break" => Token::Break,
+            "do" => Token::Do,
+            "else" => Token::Else,
+            "elseif" => Token::Elseif,
+            "end" => Token::End,
+            "false" => Token::False,
+            "for" => Token::For,
+            "function" => Token::Function,
+            "goto" => Token::Goto,
+            "if" => Token::If,
+            "in" => Token::In,
+            "local" => Token::Local,
+            "nil" => Token::Nil,
+            "not" => Token::Not,
+            "or" => Token::Or,
+            "repeat" => Token::Repeat,
+            "return" => Token::Return,
+            "then" => Token::Then,
+            "true" => Token::True,
+            "until" => Token::Until,
+            "while" => Token::While,
+            _ => Token::Name(word),
         }
     }
 
@@ -163,7 +179,8 @@ mod tests {
         let code = "print \"hello world!\"".to_string();
         let mut cursor = Cursor::new(code);
         let mut lexer = Lexer::new(&mut cursor);
-        let token = lexer.next();
-        assert_eq!(token, Token::Name("print".to_string()))
+        assert_eq!(lexer.next(), Token::Name("print".to_string()));
+        assert_eq!(lexer.next(), Token::String("hello world!".to_string()));
+        assert_eq!(lexer.next(), Token::Eos);
     }
 }
