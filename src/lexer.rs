@@ -138,7 +138,23 @@ impl<'a> Lexer<'a> {
                     Token::Integer(str.parse().unwrap())
                 }
             }
-            '=' => Token::Assign,
+            '+' => Token::Add,
+            '-' => Token::Sub,
+            '*' => Token::Mul,
+            '/' => Token::Div,
+            '%' => Token::Mod,
+            '^' => Token::Pow,
+            '#' => Token::Len,
+            '=' => {
+                let c = self.read_char();
+                match c {
+                    '=' => Token::Equal,
+                    _ => {
+                        self.seek(-1);
+                        Token::Assign
+                    }
+                }
+            }
             _ => panic!("Unexpected char in lexer"),
         }
     }
