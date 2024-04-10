@@ -155,6 +155,43 @@ impl<'a> Lexer<'a> {
                     }
                 }
             }
+            '(' => Token::ParL,
+            ')' => Token::ParR,
+            '{' => Token::CurlyL,
+            '}' => Token::CurlyR,
+            '[' => Token::SqurL,
+            ']' => Token::SqurR,
+            ':' => {
+                let c = self.read_char();
+                match c {
+                    ':' => Token::DoubColon,
+                    _ => {
+                        self.seek(-1);
+                        Token::Colon
+                    }
+                }
+            }
+            ';' => Token::SemiColon,
+            ',' => Token::Comma,
+            '.' => {
+                let c = self.read_char();
+                match c {
+                    '.' => {
+                        let c = self.read_char();
+                        match c {
+                            '.' => Token::Dots,
+                            _ => {
+                                self.seek(-1);
+                                Token::Concat
+                            }
+                        }
+                    }
+                    _ => {
+                        self.seek(-1);
+                        Token::Dot
+                    }
+                }
+            }
             _ => panic!("Unexpected char in lexer"),
         }
     }
@@ -242,5 +279,15 @@ mod tests {
         assert_eq!(lexer.next(), Token::Name("a".to_string()));
         assert_eq!(lexer.next(), Token::Assign);
         assert_eq!(lexer.next(), Token::Float(0.5));
+    }
+
+    #[test]
+    fn test_parse_dots() {
+        let code = ". .. ...".to_string();
+        let mut cursor = Cursor::new(code);
+        let mut lexer = Lexer::new(&mut cursor);
+        assert_eq!(lexer.next(), Token::Dot);
+        assert_eq!(lexer.next(), Token::Concat);
+        assert_eq!(lexer.next(), Token::Dots);
     }
 }
