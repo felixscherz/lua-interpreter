@@ -292,6 +292,14 @@ mod tests {
     }
 
     #[test]
+    fn test_parse_strings() {
+        let code = "\"<< >>\"".to_string();
+        let mut cursor = Cursor::new(code);
+        let mut lexer = Lexer::new(&mut cursor);
+        assert_eq!(lexer.next(), Token::String("<< >>".to_string()));
+    }
+
+    #[test]
     fn test_parse_integer() {
         let code = "local a = 0".to_string();
         let mut cursor = Cursor::new(code);
