@@ -29,44 +29,40 @@ pub enum Token {
     Until,
     While,
 
-    // +       -       *       /       %       ^       #
-    Add,
-    Sub,
-    Mul,
-    Div,
-    Mod,
-    Pow,
-    Len,
-    // &       ~       |       <<      >>      //
-    BitAnd,
-    BitXor,
-    BitOr,
-    ShiftL,
-    ShiftR,
-    Idiv,
-    // ==       ~=     <=      >=      <       >        =
-    Equal,
-    NotEq,
-    LesEq,
-    GreEq,
-    Less,
-    Greater,
-    Assign,
-    // (       )       {       }       [       ]       ::
-    ParL,
-    ParR,
-    CurlyL,
-    CurlyR,
-    SqurL,
-    SqurR,
-    DoubColon,
-    // ;               :       ,       .       ..      ...
-    SemiColon,
-    Colon,
-    Comma,
-    Dot,
-    Concat,
-    Dots,
+    // symbols
+    Add,       // +
+    Sub,       // -
+    Mul,       // *
+    Div,       // /
+    Mod,       // %
+    Pow,       // ^
+    Len,       // #
+    BitAnd,    // &
+    BitXor,    // ~
+    BitOr,     // |
+    ShiftL,    // <<
+    ShiftR,    // >>
+    Idiv,      // //
+    Equal,     // ==
+    NotEq,     // ~=
+    LesEq,     // <=
+    GreEq,     // >=
+    Less,      // <
+    Greater,   // >
+    Assign,    // =
+    ParL,      // (
+    ParR,      // )
+    CurlyL,    // {
+    CurlyR,    // }
+    SqurL,     // [
+    SqurR,     // ]
+    DoubColon, // ::
+    SemiColon, // ;
+    Colon,     // :
+    Comma,     // ,
+    Dot,       // .
+    Concat,    // ..
+    Dots,      // ...
 
     // constant values
     Integer(i64),
