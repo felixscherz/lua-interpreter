@@ -199,10 +199,10 @@ impl<'a> Lexer<'a> {
                     }
                 }
             }
-            '<' => Token::Less,
-            '>' => Token::Greater,
             c if self.match_pattern(c, "<<") => Token::ShiftL,
+            '<' => Token::Less,
             c if self.match_pattern(c, ">>") => Token::ShiftR,
+            '>' => Token::Greater,
             c if self.match_pattern(c, "//") => Token::Idiv,
             c if self.match_pattern(c, "<=") => Token::LesEq,
             c if self.match_pattern(c, ">=") => Token::GreEq,
