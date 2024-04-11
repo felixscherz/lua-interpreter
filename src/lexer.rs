@@ -3,7 +3,6 @@ use std::{
     io::{Read, Seek, SeekFrom},
 };
 
-#[allow(dead_code)]
 #[derive(Debug, PartialEq)]
 pub enum Token {
     // keywords
@@ -145,6 +144,7 @@ impl<'a> Lexer<'a> {
             '%' => Token::Mod,
             '^' => Token::Pow,
             '#' => Token::Len,
+            '&' => Token::BitAnd,
             '=' => {
                 let c = self.read_char();
                 match c {
@@ -155,6 +155,17 @@ impl<'a> Lexer<'a> {
                     }
                 }
             }
+            '~' => {
+                let c = self.read_char();
+                match c {
+                    '=' => Token::NotEq,
+                    _ => {
+                        self.seek(-1);
+                        Token::BitXor
+                    }
+                }
+            }
+            '|' => Token::BitOr,
             '(' => Token::ParL,
             ')' => Token::ParR,
             '{' => Token::CurlyL,
@@ -192,6 +203,13 @@ impl<'a> Lexer<'a> {
                     }
                 }
             }
+            '<' => Token::Less,
+            '>' => Token::Greater,
+            c if self.match_pattern(c, "<<") => Token::ShiftL,
+            c if self.match_pattern(c, ">>") => Token::ShiftR,
+            c if self.match_pattern(c, "//") => Token::Idiv,
+            c if self.match_pattern(c, "<=") => Token::LesEq,
+            c if self.match_pattern(c, ">=") => Token::GreEq,
             _ => panic!("Unexpected char in lexer"),
         }
     }
@@ -230,6 +248,20 @@ impl<'a> Lexer<'a> {
             "while" => Token::While,
             _ => Token::Name(word),
         }
+    }
+
+    fn match_pattern(&mut self, start: char, pattern: &str) -> bool {
+        let mut n = 0;
+        let mut next_char = start;
+        for c in pattern.chars() {
+            if next_char != c {
+                self.seek(-n);
+                return false;
+            }
+            next_char = self.read_char();
+            n += 1;
+        }
+        true
     }
 
     fn read_char(&mut self) -> char {
@@ -289,5 +321,14 @@ mod tests {
         assert_eq!(lexer.next(), Token::Dot);
         assert_eq!(lexer.next(), Token::Concat);
         assert_eq!(lexer.next(), Token::Dots);
+    }
+
+    #[test]
+    fn test_parse_shifts() {
+        let code = "<< >>".to_string();
+        let mut cursor = Cursor::new(code);
+        let mut lexer = Lexer::new(&mut cursor);
+        assert_eq!(lexer.next(), Token::ShiftL);
+        assert_eq!(lexer.next(), Token::ShiftR);
     }
 }
