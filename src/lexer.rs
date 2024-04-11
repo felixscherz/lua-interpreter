@@ -329,10 +329,12 @@ mod tests {
 
     #[test]
     fn test_parse_shifts() {
-        let code = "<< >>".to_string();
+        let code = "<< >> < >".to_string();
         let mut cursor = Cursor::new(code);
         let mut lexer = Lexer::new(&mut cursor);
         assert_eq!(lexer.next(), Token::ShiftL);
         assert_eq!(lexer.next(), Token::ShiftR);
+        assert_eq!(lexer.next(), Token::Less);
+        assert_eq!(lexer.next(), Token::Greater);
     }
 }
