@@ -337,4 +337,14 @@ mod tests {
         assert_eq!(lexer.next(), Token::Less);
         assert_eq!(lexer.next(), Token::Greater);
     }
+
+    #[test]
+    fn test_parse_addition() {
+        let code = "5+5".to_string();
+        let mut cursor = Cursor::new(code);
+        let mut lexer = Lexer::new(&mut cursor);
+        assert_eq!(lexer.next(), Token::Integer(5));
+        assert_eq!(lexer.next(), Token::Add);
+        assert_eq!(lexer.next(), Token::Integer(5));
+    }
 }
