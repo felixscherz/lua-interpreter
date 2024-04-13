@@ -124,7 +124,10 @@ impl<'a> Lexer<'a> {
                             is_float = true;
                             str.push(c)
                         }
-                        _ => break,
+                        _ => {
+                            self.seek(-1);
+                            break;
+                        }
                     }
                 }
                 if is_float {
