@@ -7,6 +7,9 @@ pub enum Value {
     Nil,
     String(String),
     Function(fn(&mut ExeState) -> i32),
+    Integer(i64),
+    Float(f64),
+    Boolean(bool),
 }
 
 impl fmt::Debug for Value {
@@ -15,6 +18,9 @@ impl fmt::Debug for Value {
             Value::Nil => write!(f, "nil"),
             Value::String(s) => write!(f, "{s}"),
             Value::Function(_) => write!(f, "function"),
+            Value::Integer(i) => write!(f, "{i}"),
+            Value::Float(v) => write!(f, "{v:?}"),
+            Value::Boolean(b) => write!(f, "{b}"),
         }
     }
 }
