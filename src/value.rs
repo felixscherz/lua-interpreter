@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::vm::ExeState;
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub enum Value {
     Nil,
     String(String),

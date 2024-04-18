@@ -217,10 +217,13 @@ impl<'a> Lexer<'a> {
         let mut word = String::new();
         loop {
             let c = self.read_char();
-            if c == ' ' {
-                break;
+            match c {
+                'A'..='Z' | 'a'..='z' | '_' => word.push(c),
+                _ => {
+                    self.seek(-1);
+                    break;
+                }
             }
-            word.push(c);
         }
         match word.as_str() {
             "and" => Token::And,
@@ -349,5 +352,16 @@ mod tests {
         assert_eq!(lexer.next(), Token::Integer(5));
         assert_eq!(lexer.next(), Token::Add);
         assert_eq!(lexer.next(), Token::Integer(5));
+    }
+
+    #[test]
+    fn test_parse_function_calls() {
+        let code = "print(1)".to_string();
+        let mut cursor = Cursor::new(code);
+        let mut lexer = Lexer::new(&mut cursor);
+        assert_eq!(lexer.next(), Token::Name("print".to_string()));
+        assert_eq!(lexer.next(), Token::ParL);
+        assert_eq!(lexer.next(), Token::Integer(1));
+        assert_eq!(lexer.next(), Token::ParR);
     }
 }

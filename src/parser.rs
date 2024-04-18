@@ -77,3 +77,44 @@ pub fn load(stream: &mut File) -> ParseProto {
         byte_codes,
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use std::io::{self, Seek, Write};
+    use tempfile::tempfile;
+
+    fn prepare_file(code: &str) -> File {
+        let mut file = tempfile().unwrap();
+        file.write(code.as_bytes()).unwrap();
+        file.seek(io::SeekFrom::Start(0)).unwrap();
+        file
+    }
+
+    #[test]
+    fn parse_print_hello_world() {
+        let mut file = prepare_file("print \"hello world!\"\n");
+
+        let proto = load(&mut file);
+
+        assert_eq!(
+            proto.constants,
+            vec![
+                Value::String("print".to_string()),
+                Value::String("hello world!".to_string())
+            ]
+        );
+    }
+
+    #[test]
+    fn parse_print_integer() {
+        let mut file = prepare_file("print (1)");
+
+        let proto = load(&mut file);
+
+        assert_eq!(
+            proto.constants,
+            vec![Value::String("print".to_string()), Value::Integer(1)]
+        );
+    }
+}
