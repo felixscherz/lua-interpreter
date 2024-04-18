@@ -17,3 +17,18 @@ fn test_hello_world() {
     output.read_to_string(&mut buffer).unwrap();
     assert_eq!(buffer, "hello world!\n");
 }
+
+#[test]
+fn test_print_integer() {
+    let mut file = tempfile().unwrap();
+    file.write("print (1)\n".as_bytes()).unwrap();
+    file.seek(io::SeekFrom::Start(0)).unwrap();
+
+    let mut output = tempfile().unwrap();
+
+    lua(&mut file, &mut output);
+    let mut buffer = String::new();
+    output.seek(io::SeekFrom::Start(0)).unwrap();
+    output.read_to_string(&mut buffer).unwrap();
+    assert_eq!(buffer, "1\n");
+}

@@ -30,6 +30,21 @@ pub fn load(stream: &mut File) -> ParseProto {
                 // >>> print(1.0)
 
                 match lex.next() {
+                    Token::ParL => {
+                        match lex.next() {
+                            Token::Integer(i) => {
+                                constants.push(Value::Integer(i));
+                                byte_codes
+                                    .push(ByteCode::LoadConst(1, (constants.len() - 1) as u8));
+                            }
+                            _ => panic!("Expected something else"),
+                        }
+                        if let Token::ParR = lex.next() {
+                        } else {
+                            panic!("No closing paren")
+                        }
+                        byte_codes.push(ByteCode::Call(0, 1));
+                    }
                     Token::String(s) => {
                         constants.push(Value::String(s));
                         byte_codes.push(ByteCode::LoadConst(1, (constants.len() - 1) as u8));
