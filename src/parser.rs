@@ -25,17 +25,30 @@ pub fn load(stream: &mut File) -> ParseProto {
                 // Push instructions to get function name from constants and push to stack at 0
                 byte_codes.push(ByteCode::GetGlobal(0, (constants.len() - 1) as u8));
 
+                // TODO before parsing the function argument as a string, we have to check if there
+                // are arguments enclosed in parentheses.
+                // >>> print(1.0)
+
+                match lex.next() {
+                    Token::String(s) => {
+                        constants.push(Value::String(s));
+                        byte_codes.push(ByteCode::LoadConst(1, (constants.len() - 1) as u8));
+                        byte_codes.push(ByteCode::Call(0, 1));
+                    }
+                    _ => panic!("expected string"),
+                }
+
                 // Parse the string argument, save it to the constants.
                 // Add instruction to load the argument from constants onto the stack on top of
                 // the function call, then push a call instruction which is supposed to use the
                 // function at index 0 and use index 1 as arguments
-                if let Token::String(s) = lex.next() {
-                    constants.push(Value::String(s));
-                    byte_codes.push(ByteCode::LoadConst(1, (constants.len() - 1) as u8));
-                    byte_codes.push(ByteCode::Call(0, 1));
-                } else {
-                    panic!("expected string");
-                }
+                // if let Token::String(s) = lex.next() {
+                //     constants.push(Value::String(s));
+                //     byte_codes.push(ByteCode::LoadConst(1, (constants.len() - 1) as u8));
+                //     byte_codes.push(ByteCode::Call(0, 1));
+                // } else {
+                //     panic!("expected string");
+                // }
             }
             Token::Eos => break,
             t => panic!("unexpected token: {t:?}"),
