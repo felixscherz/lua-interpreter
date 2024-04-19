@@ -37,6 +37,11 @@ pub fn load(stream: &mut File) -> ParseProto {
                                 byte_codes
                                     .push(ByteCode::LoadConst(1, (constants.len() - 1) as u8));
                             }
+                            Token::Float(f) => {
+                                constants.push(Value::Float(f));
+                                byte_codes
+                                    .push(ByteCode::LoadConst(1, (constants.len() - 1) as u8));
+                            }
                             _ => panic!("Expected something else"),
                         }
                         if let Token::ParR = lex.next() {
@@ -108,13 +113,25 @@ mod test {
 
     #[test]
     fn parse_print_integer() {
-        let mut file = prepare_file("print (1)");
+        let mut file = prepare_file("print(1)");
 
         let proto = load(&mut file);
 
         assert_eq!(
             proto.constants,
             vec![Value::String("print".to_string()), Value::Integer(1)]
+        );
+    }
+
+    #[test]
+    fn parse_print_float() {
+        let mut file = prepare_file("print(1.5)");
+
+        let proto = load(&mut file);
+
+        assert_eq!(
+            proto.constants,
+            vec![Value::String("print".to_string()), Value::Float(1.5)]
         );
     }
 }
