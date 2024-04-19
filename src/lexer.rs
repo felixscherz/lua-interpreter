@@ -355,13 +355,24 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_function_calls() {
+    fn test_parse_printing_integers() {
         let code = "print(1)".to_string();
         let mut cursor = Cursor::new(code);
         let mut lexer = Lexer::new(&mut cursor);
         assert_eq!(lexer.next(), Token::Name("print".to_string()));
         assert_eq!(lexer.next(), Token::ParL);
         assert_eq!(lexer.next(), Token::Integer(1));
+        assert_eq!(lexer.next(), Token::ParR);
+    }
+
+    #[test]
+    fn test_parse_printing_floats() {
+        let code = "print(1.5)".to_string();
+        let mut cursor = Cursor::new(code);
+        let mut lexer = Lexer::new(&mut cursor);
+        assert_eq!(lexer.next(), Token::Name("print".to_string()));
+        assert_eq!(lexer.next(), Token::ParL);
+        assert_eq!(lexer.next(), Token::Float(1.5));
         assert_eq!(lexer.next(), Token::ParR);
     }
 }
