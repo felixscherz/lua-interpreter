@@ -37,6 +37,11 @@ pub fn load(stream: &mut File) -> ParseProto {
                                 byte_codes
                                     .push(ByteCode::LoadConst(1, (constants.len() - 1) as u8));
                             }
+                            Token::Nil => {
+                                byte_codes.push(ByteCode::LoadNil(1));
+                            }
+                            Token::True => byte_codes.push(ByteCode::LoadBool(1, true)),
+                            Token::False => byte_codes.push(ByteCode::LoadBool(1, false)),
                             _ => panic!("Expected something else"),
                         }
                         if let Token::ParR = lex.next() {

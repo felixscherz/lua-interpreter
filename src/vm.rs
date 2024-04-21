@@ -55,6 +55,8 @@ impl<'a> ExeState<'a> {
                         panic!("invalid function: {func:?}");
                     }
                 }
+                ByteCode::LoadNil(dst) => self.set_stack(dst, Value::Nil),
+                ByteCode::LoadBool(dst, v) => self.set_stack(dst, Value::Boolean(v)),
             }
         }
     }

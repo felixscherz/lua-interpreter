@@ -7,4 +7,6 @@ pub enum ByteCode {
     /// load value from constants into stack at dst
     LoadConst(u8, u8),
     Call(u8, u8),
+    LoadBool(u8, bool),
+    LoadNil(u8),
 }
