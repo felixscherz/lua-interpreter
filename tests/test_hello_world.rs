@@ -13,6 +13,13 @@ fn prepare_file(code: &str) -> File {
     file
 }
 
+fn compare_output(output: &mut File, expected: &str) {
+    let mut buffer = String::new();
+    output.seek(io::SeekFrom::Start(0)).unwrap();
+    output.read_to_string(&mut buffer).unwrap();
+    assert_eq!(buffer, expected);
+}
+
 #[test]
 fn test_hello_world() {
     let mut file = prepare_file("print \"hello world!\"\n");
@@ -20,10 +27,7 @@ fn test_hello_world() {
 
     lua(&mut file, &mut output);
 
-    let mut buffer = String::new();
-    output.seek(io::SeekFrom::Start(0)).unwrap();
-    output.read_to_string(&mut buffer).unwrap();
-    assert_eq!(buffer, "hello world!\n");
+    compare_output(&mut output, "hello world!\n");
 }
 
 #[test]
@@ -33,10 +37,7 @@ fn test_print_integer() {
 
     lua(&mut file, &mut output);
 
-    let mut buffer = String::new();
-    output.seek(io::SeekFrom::Start(0)).unwrap();
-    output.read_to_string(&mut buffer).unwrap();
-    assert_eq!(buffer, "1\n");
+    compare_output(&mut output, "1\n");
 }
 
 #[test]
@@ -46,10 +47,7 @@ fn test_print_bool() {
 
     lua(&mut file, &mut output);
 
-    let mut buffer = String::new();
-    output.seek(io::SeekFrom::Start(0)).unwrap();
-    output.read_to_string(&mut buffer).unwrap();
-    assert_eq!(buffer, "true\n");
+    compare_output(&mut output, "true\n");
 }
 
 #[test]
@@ -59,8 +57,5 @@ fn test_print_nil() {
 
     lua(&mut file, &mut output);
 
-    let mut buffer = String::new();
-    output.seek(io::SeekFrom::Start(0)).unwrap();
-    output.read_to_string(&mut buffer).unwrap();
-    assert_eq!(buffer, "nil\n");
+    compare_output(&mut output, "nil\n");
 }
