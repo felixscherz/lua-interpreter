@@ -57,6 +57,7 @@ impl<'a> ExeState<'a> {
                 }
                 ByteCode::LoadNil(dst) => self.set_stack(dst, Value::Nil),
                 ByteCode::LoadBool(dst, v) => self.set_stack(dst, Value::Boolean(v)),
+                ByteCode::LoadInteger(dst, v) => self.set_stack(dst, Value::Integer(v.into())),
             }
         }
     }

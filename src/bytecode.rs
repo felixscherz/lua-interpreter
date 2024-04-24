@@ -9,4 +9,8 @@ pub enum ByteCode {
     Call(u8, u8),
     LoadBool(u8, bool),
     LoadNil(u8),
+    /// LoadInteger(dst, value)
+    /// Since bytecodes can be at most 4 bytes and one byte is reserved for the enum tag
+    /// we can get away with storing small integers directly in the bytecode instruction
+    LoadInteger(u8, i16),
 }
