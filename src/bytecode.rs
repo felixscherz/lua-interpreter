@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum ByteCode {
     /// GetGlobal(dst, src):
     /// load global name from constants at src and load global into stack at dst

@@ -28,9 +28,13 @@ pub fn load(stream: &mut File) -> ParseProto {
                     Token::ParL => {
                         match lex.next() {
                             Token::Integer(i) => {
-                                constants.push(Value::Integer(i));
-                                byte_codes
-                                    .push(ByteCode::LoadConst(1, (constants.len() - 1) as u8));
+                                if let Ok(smallint) = i16::try_from(i) {
+                                    byte_codes.push(ByteCode::LoadInteger(1, smallint));
+                                } else {
+                                    constants.push(Value::Integer(i));
+                                    byte_codes
+                                        .push(ByteCode::LoadConst(1, (constants.len() - 1) as u8));
+                                }
                             }
                             Token::Float(f) => {
                                 constants.push(Value::Float(f));
@@ -100,14 +104,30 @@ mod test {
     }
 
     #[test]
-    fn parse_print_integer() {
-        let mut file = prepare_file("print(1)");
+    fn parse_print_large_integer() {
+        let mut file = prepare_file("print(33000)");
 
         let proto = load(&mut file);
 
         assert_eq!(
             proto.constants,
-            vec![Value::String("print".to_string()), Value::Integer(1)]
+            vec![Value::String("print".to_string()), Value::Integer(33000)]
+        );
+    }
+
+    #[test]
+    fn parse_print_small_integer() {
+        let mut file = prepare_file("print(1)");
+
+        let proto = load(&mut file);
+
+        assert_eq!(
+            proto.byte_codes,
+            vec![
+                ByteCode::GetGlobal(0, 0),
+                ByteCode::LoadInteger(1, 1_i16),
+                ByteCode::Call(0, 1)
+            ]
         );
     }
 
