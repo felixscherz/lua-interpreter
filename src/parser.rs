@@ -31,13 +31,15 @@ pub fn load(stream: &mut File) -> ParseProto {
                                 if let Ok(smallint) = i16::try_from(i) {
                                     byte_codes.push(ByteCode::LoadInteger(1, smallint));
                                 } else {
-                                    let src = add_const(&mut constants, Value::Integer(i));
-                                    byte_codes.push(ByteCode::LoadConst(1, src as u8));
+                                    byte_codes.push(load_const(
+                                        &mut constants,
+                                        1,
+                                        Value::Integer(i),
+                                    ))
                                 }
                             }
                             Token::Float(f) => {
-                                let src = add_const(&mut constants, Value::Float(f));
-                                byte_codes.push(ByteCode::LoadConst(1, src as u8));
+                                byte_codes.push(load_const(&mut constants, 1, Value::Float(f)))
                             }
                             Token::Nil => {
                                 byte_codes.push(ByteCode::LoadNil(1));
@@ -73,9 +75,15 @@ pub fn load(stream: &mut File) -> ParseProto {
     }
 }
 
+/// adding constants is a separate function because it is a place to make performance optimizations
+/// in case of duplicate constants we can just reference the same value instead of adding it twice
 fn add_const(constants: &mut Vec<Value>, v: Value) -> usize {
     constants.push(v);
     constants.len() - 1
+}
+
+fn load_const(constants: &mut Vec<Value>, dst: usize, v: Value) -> ByteCode {
+    ByteCode::LoadConst(dst as u8, add_const(constants, v) as u8)
 }
 
 #[cfg(test)]
