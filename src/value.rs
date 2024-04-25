@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::vm::ExeState;
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone)]
 pub enum Value {
     Nil,
     String(String),
@@ -21,6 +21,20 @@ impl fmt::Debug for Value {
             Value::Integer(i) => write!(f, "{i}"),
             Value::Float(v) => write!(f, "{v:?}"),
             Value::Boolean(b) => write!(f, "{b}"),
+        }
+    }
+}
+
+impl PartialEq for Value {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Value::Boolean(a), Value::Boolean(b)) => a == b,
+            (Value::Nil, Value::Nil) => true,
+            (Value::String(a), Value::String(b)) => a == b,
+            (Value::Function(a), Value::Function(b)) => std::ptr::eq(a, b),
+            (Value::Integer(a), Value::Integer(b)) => a == b,
+            (Value::Float(a), Value::Float(b)) => a == b,
+            _ => false,
         }
     }
 }

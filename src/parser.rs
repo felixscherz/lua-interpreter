@@ -78,8 +78,10 @@ pub fn load(stream: &mut File) -> ParseProto {
 /// adding constants is a separate function because it is a place to make performance optimizations
 /// in case of duplicate constants we can just reference the same value instead of adding it twice
 fn add_const(constants: &mut Vec<Value>, v: Value) -> usize {
-    constants.push(v);
-    constants.len() - 1
+    constants.iter().position(|c| c == &v).unwrap_or_else(|| {
+        constants.push(v);
+        constants.len() - 1
+    })
 }
 
 fn load_const(constants: &mut Vec<Value>, dst: usize, v: Value) -> ByteCode {
@@ -145,6 +147,18 @@ mod test {
     #[test]
     fn parse_print_float() {
         let mut file = prepare_file("print(1.5)");
+
+        let proto = load(&mut file);
+
+        assert_eq!(
+            proto.constants,
+            vec![Value::String("print".to_string()), Value::Float(1.5)]
+        );
+    }
+
+    #[test]
+    fn multiple_constants_stored_only_once() {
+        let mut file = prepare_file("print(1.5)\nprint(1.5)");
 
         let proto = load(&mut file);
 
