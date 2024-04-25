@@ -21,9 +21,9 @@ pub fn load(stream: &mut File) -> ParseProto {
             Token::Name(name) => {
                 // `Name LiteralString` as function call
                 // Push function name to the constants
-                constants.push(Value::String(name));
+                let src = add_const(&mut constants, Value::String(name));
                 // Push instructions to get function name from constants and push to stack at 0
-                byte_codes.push(ByteCode::GetGlobal(0, (constants.len() - 1) as u8));
+                byte_codes.push(ByteCode::GetGlobal(0, src as u8));
                 match lex.next() {
                     Token::ParL => {
                         match lex.next() {
@@ -31,15 +31,13 @@ pub fn load(stream: &mut File) -> ParseProto {
                                 if let Ok(smallint) = i16::try_from(i) {
                                     byte_codes.push(ByteCode::LoadInteger(1, smallint));
                                 } else {
-                                    constants.push(Value::Integer(i));
-                                    byte_codes
-                                        .push(ByteCode::LoadConst(1, (constants.len() - 1) as u8));
+                                    let src = add_const(&mut constants, Value::Integer(i));
+                                    byte_codes.push(ByteCode::LoadConst(1, src as u8));
                                 }
                             }
                             Token::Float(f) => {
-                                constants.push(Value::Float(f));
-                                byte_codes
-                                    .push(ByteCode::LoadConst(1, (constants.len() - 1) as u8));
+                                let src = add_const(&mut constants, Value::Float(f));
+                                byte_codes.push(ByteCode::LoadConst(1, src as u8));
                             }
                             Token::Nil => {
                                 byte_codes.push(ByteCode::LoadNil(1));
@@ -55,8 +53,8 @@ pub fn load(stream: &mut File) -> ParseProto {
                         byte_codes.push(ByteCode::Call(0, 1));
                     }
                     Token::String(s) => {
-                        constants.push(Value::String(s));
-                        byte_codes.push(ByteCode::LoadConst(1, (constants.len() - 1) as u8));
+                        let src = add_const(&mut constants, Value::String(s));
+                        byte_codes.push(ByteCode::LoadConst(1, src as u8));
                         byte_codes.push(ByteCode::Call(0, 1));
                     }
                     _ => panic!("expected string"),
@@ -73,6 +71,11 @@ pub fn load(stream: &mut File) -> ParseProto {
         constants,
         byte_codes,
     }
+}
+
+fn add_const(constants: &mut Vec<Value>, v: Value) -> usize {
+    constants.push(v);
+    constants.len() - 1
 }
 
 #[cfg(test)]
