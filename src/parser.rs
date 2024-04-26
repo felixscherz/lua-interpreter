@@ -167,4 +167,10 @@ mod test {
             vec![Value::String("print".to_string()), Value::Float(1.5)]
         );
     }
+
+    #[test]
+    fn assign_variable() {
+        let mut file = prepare_file("a = 1");
+        let proto = load(&mut file);
+    }
 }
