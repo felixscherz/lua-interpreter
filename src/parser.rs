@@ -15,6 +15,7 @@ pub fn load(stream: &mut File) -> ParseProto {
     let mut constants = Vec::new();
     let mut byte_codes = Vec::new();
     let mut lex = Lexer::new(stream);
+    let mut locals: Vec<String> = Vec::new();
 
     loop {
         match lex.next() {
@@ -62,6 +63,26 @@ pub fn load(stream: &mut File) -> ParseProto {
                     _ => panic!("expected string"),
                 }
             }
+            Token::Local => match lex.next() {
+                Token::Name(name) => {
+                    // add name to local variables then parse the expression that follows the =
+                    // sign.
+                    if !(lex.next() == Token::Assign) {
+                        panic!("Expected assignment operator")
+                    }
+                    // need to load expression onto the stack if the expression is a simple value, then just add that
+                    // to the stack, but if it is another name, then check local variables for the
+                    // variable, after that globals. Locals will never be saved to constants. When
+                    // looking up a name in the local variables the index of the name in the locals
+                    // list indicates the stack position where the value can be copied from.
+                    if let Token::Integer(i) = lex.next() {
+                        byte_codes.push(load_const(&mut constants, 1, Value::Integer(i)))
+                    } else {
+                        panic!("Not implemented")
+                    }
+                }
+                _ => panic!("Expected name after local keyword"),
+            },
             Token::Eos => break,
             t => panic!("unexpected token: {t:?}"),
         }
@@ -170,7 +191,7 @@ mod test {
 
     #[test]
     fn assign_variable() {
-        let mut file = prepare_file("a = 1");
+        let mut file = prepare_file("local a = 1");
         let proto = load(&mut file);
     }
 }

@@ -31,6 +31,10 @@ impl<'a> ExeState<'a> {
         }
     }
 
+    fn get_stack(&self, src: u8) -> Value {
+        self.stack.get(src as usize).unwrap().clone()
+    }
+
     pub fn execute(&mut self, proto: &ParseProto) {
         for code in proto.byte_codes.iter() {
             match *code {
@@ -58,6 +62,7 @@ impl<'a> ExeState<'a> {
                 ByteCode::LoadNil(dst) => self.set_stack(dst, Value::Nil),
                 ByteCode::LoadBool(dst, v) => self.set_stack(dst, Value::Boolean(v)),
                 ByteCode::LoadInteger(dst, v) => self.set_stack(dst, Value::Integer(v.into())),
+                ByteCode::Move(dst, src) => self.set_stack(dst, self.get_stack(src)),
             }
         }
     }

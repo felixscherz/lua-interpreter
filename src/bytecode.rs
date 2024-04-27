@@ -13,4 +13,6 @@ pub enum ByteCode {
     /// Since bytecodes can be at most 4 bytes and one byte is reserved for the enum tag
     /// we can get away with storing small integers directly in the bytecode instruction
     LoadInteger(u8, i16),
+    /// Move(dst, src)
+    Move(u8, u8),
 }
