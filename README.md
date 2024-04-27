@@ -26,3 +26,10 @@ several operand fields of 8 or 16 bit. Instructions come in one of two formats:
 |   D   | A | OP|
 +---+---+---+---+
 ```
+
+## How local variables work
+
+When assigning local variables they are stored on the stack and their name is appended to a `locals` list.
+When a name is referenced, first go through `locals` in reverse. If the name can be found, its index points to the
+stack index where the value is stored. The VM can then use the MOVE(dst, src) bytecode to copy that value to the top
+of the stack.
