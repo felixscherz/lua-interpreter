@@ -19,7 +19,29 @@ pub fn load(stream: &mut File) -> ParseProto {
 
     loop {
         match lex.next() {
+            Token::Local => match lex.next() {
+                Token::Name(name) => {
+                    // add name to local variables then parse the expression that follows the =
+                    // sign.
+                    if !(lex.next() == Token::Assign) {
+                        panic!("Expected assignment operator")
+                    }
+                    // need to load expression onto the stack if the expression is a simple value, then just add that
+                    // to the stack, but if it is another name, then check local variables for the
+                    // variable, after that globals. Locals will never be saved to constants. When
+                    // looking up a name in the local variables the index of the name in the locals
+                    // list indicates the stack position where the value can be copied from.
+                    if let Token::Integer(i) = lex.next() {
+                        byte_codes.push(load_const(&mut constants, 1, Value::Integer(i)))
+                    } else {
+                        panic!("Not implemented")
+                    }
+                    locals.push(name)
+                }
+                _ => panic!("Expected name after local keyword"),
+            },
             Token::Name(name) => {
+                dbg!(&name);
                 // `Name LiteralString` as function call
                 // Push function name to the constants
                 let src = add_const(&mut constants, Value::String(name));
@@ -28,6 +50,12 @@ pub fn load(stream: &mut File) -> ParseProto {
                 match lex.next() {
                     Token::ParL => {
                         match lex.next() {
+                            Token::Name(var) => {
+                                // references a variable that should either be defined locally or
+                                // globally
+                                let i = locals.iter().rposition(|v| v == &var).unwrap();
+                                byte_codes.push(ByteCode::Move(1, i as u8));
+                            }
                             Token::Integer(i) => {
                                 if let Ok(smallint) = i16::try_from(i) {
                                     byte_codes.push(ByteCode::LoadInteger(1, smallint));
@@ -63,26 +91,6 @@ pub fn load(stream: &mut File) -> ParseProto {
                     _ => panic!("expected string"),
                 }
             }
-            Token::Local => match lex.next() {
-                Token::Name(name) => {
-                    // add name to local variables then parse the expression that follows the =
-                    // sign.
-                    if !(lex.next() == Token::Assign) {
-                        panic!("Expected assignment operator")
-                    }
-                    // need to load expression onto the stack if the expression is a simple value, then just add that
-                    // to the stack, but if it is another name, then check local variables for the
-                    // variable, after that globals. Locals will never be saved to constants. When
-                    // looking up a name in the local variables the index of the name in the locals
-                    // list indicates the stack position where the value can be copied from.
-                    if let Token::Integer(i) = lex.next() {
-                        byte_codes.push(load_const(&mut constants, 1, Value::Integer(i)))
-                    } else {
-                        panic!("Not implemented")
-                    }
-                }
-                _ => panic!("Expected name after local keyword"),
-            },
             Token::Eos => break,
             t => panic!("unexpected token: {t:?}"),
         }
@@ -191,7 +199,7 @@ mod test {
 
     #[test]
     fn assign_variable() {
-        let mut file = prepare_file("local a = 1");
+        let mut file = prepare_file("local a = 1\nprint(a)");
         let proto = load(&mut file);
     }
 }

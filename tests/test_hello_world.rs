@@ -59,3 +59,13 @@ fn test_print_nil() {
 
     compare_output(&mut output, "nil\n");
 }
+
+#[test]
+fn test_print_local_variable() {
+    let mut file = prepare_file("local a = 1\nprint(a)");
+    let mut output = tempfile().unwrap();
+
+    lua(&mut file, &mut output);
+
+    compare_output(&mut output, "1\n");
+}
