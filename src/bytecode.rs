@@ -6,6 +6,9 @@ pub enum ByteCode {
     /// LoadConst(dst, src):
     /// load value from constants into stack at dst
     LoadConst(u8, u8),
+    /// Call(func_index, ???)
+    /// invokes the function at funx_index on the stack, for now it expects a single argument
+    /// at func_index+1 on the stack
     Call(u8, u8),
     LoadBool(u8, bool),
     LoadNil(u8),
