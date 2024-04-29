@@ -42,3 +42,9 @@ of the stack.
 2. the next opcode is `LoadConst(dst,src)` which loads `"hello world"` from the `constants` list to `dst` on the stack
 3. the opcode `Call(func_index, ...)` which executes the function that is stored on the stack at `func_index`. The
 function takes a single argument and expects it at `func_index+1` on the stack.
+
+## Other stack operations
+
+Aside from loading functions and their arguments onto the stack to be executed, local variables are also stored on the
+stack. This is what makes them execute faster than accessing global variables.
+Therefore the next free index on the stack is equivalent to `locals.len()`.
