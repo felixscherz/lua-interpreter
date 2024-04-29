@@ -32,7 +32,7 @@ pub fn load(stream: &mut File) -> ParseProto {
                     // looking up a name in the local variables the index of the name in the locals
                     // list indicates the stack position where the value can be copied from.
                     if let Token::Integer(i) = lex.next() {
-                        byte_codes.push(load_const(&mut constants, 1, Value::Integer(i)))
+                        byte_codes.push(load_const(&mut constants, 0, Value::Integer(i)))
                     } else {
                         panic!("Not implemented")
                     }
@@ -46,7 +46,7 @@ pub fn load(stream: &mut File) -> ParseProto {
                 // Push function name to the constants
                 let src = add_const(&mut constants, Value::String(name));
                 // Push instructions to get function name from constants and push to stack at 0
-                byte_codes.push(ByteCode::GetGlobal(0, src as u8));
+                byte_codes.push(ByteCode::GetGlobal(1, src as u8));
                 match lex.next() {
                     Token::ParL => {
                         match lex.next() {
@@ -54,7 +54,7 @@ pub fn load(stream: &mut File) -> ParseProto {
                                 // references a variable that should either be defined locally or
                                 // globally
                                 let i = locals.iter().rposition(|v| v == &var).unwrap();
-                                byte_codes.push(ByteCode::Move(1, i as u8));
+                                byte_codes.push(ByteCode::Move(0, i as u8));
                             }
                             Token::Integer(i) => {
                                 if let Ok(smallint) = i16::try_from(i) {
@@ -81,7 +81,7 @@ pub fn load(stream: &mut File) -> ParseProto {
                         } else {
                             panic!("No closing paren")
                         }
-                        byte_codes.push(ByteCode::Call(0, 1));
+                        byte_codes.push(ByteCode::Call(1, 0));
                     }
                     Token::String(s) => {
                         let src = add_const(&mut constants, Value::String(s));

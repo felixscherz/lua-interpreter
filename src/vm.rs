@@ -37,6 +37,7 @@ impl<'a> ExeState<'a> {
 
     pub fn execute(&mut self, proto: &ParseProto) {
         for code in proto.byte_codes.iter() {
+            dbg!(&self.stack);
             match *code {
                 ByteCode::GetGlobal(dst, name) => {
                     let name = &proto.constants[name as usize];
@@ -71,6 +72,6 @@ impl<'a> ExeState<'a> {
 // "print" function in Lua's std-lib.
 // It supports only 1 argument and assumes the argument is at index:1 on stack.
 fn lib_print(state: &mut ExeState) -> i32 {
-    writeln!(state.output, "{:?}", state.stack[1]).unwrap();
+    writeln!(state.output, "{:?}", state.stack[0]).unwrap();
     0
 }
