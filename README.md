@@ -33,3 +33,12 @@ When assigning local variables they are stored on the stack and their name is ap
 When a name is referenced, first go through `locals` in reverse. If the name can be found, its index points to the
 stack index where the value is stored. The VM can then use the MOVE(dst, src) bytecode to copy that value to the top
 of the stack.
+
+
+## How a function is executed in `print("hello world")`
+
+1. the `print` function is loaded onto the stack with the `GetGlobal(dst,src)`. It finds the name of the global at
+`src` in the `constants` and loads it onto the stack at `dst`.
+2. the next opcode is `LoadConst(dst,src)` which loads `"hello world"` from the `constants` list to `dst` on the stack
+3. the opcode `Call(func_index, ...)` which executes the function that is stored on the stack at `func_index`. The
+function takes a single argument and expects it at `func_index+1` on the stack.
