@@ -41,12 +41,11 @@ pub fn load(stream: &mut File) -> ParseProto {
                 _ => panic!("Expected name after local keyword"),
             },
             Token::Name(name) => {
-                dbg!(&name);
                 // `Name LiteralString` as function call
                 // Push function name to the constants
                 let src = add_const(&mut constants, Value::String(name));
                 // Push instructions to get function name from constants and push to stack at 0
-                byte_codes.push(ByteCode::GetGlobal(1, src as u8));
+                byte_codes.push(ByteCode::GetGlobal(locals.len() as u8, src as u8));
                 match lex.next() {
                     Token::ParL => {
                         match lex.next() {
@@ -54,39 +53,48 @@ pub fn load(stream: &mut File) -> ParseProto {
                                 // references a variable that should either be defined locally or
                                 // globally
                                 let i = locals.iter().rposition(|v| v == &var).unwrap();
-                                byte_codes.push(ByteCode::Move(0, i as u8));
+                                byte_codes.push(ByteCode::Move((locals.len() + 1) as u8, i as u8));
                             }
                             Token::Integer(i) => {
                                 if let Ok(smallint) = i16::try_from(i) {
-                                    byte_codes.push(ByteCode::LoadInteger(1, smallint));
+                                    byte_codes.push(ByteCode::LoadInteger(
+                                        (locals.len() + 1) as u8,
+                                        smallint,
+                                    ));
                                 } else {
                                     byte_codes.push(load_const(
                                         &mut constants,
-                                        1,
+                                        locals.len() + 1,
                                         Value::Integer(i),
                                     ))
                                 }
                             }
-                            Token::Float(f) => {
-                                byte_codes.push(load_const(&mut constants, 1, Value::Float(f)))
-                            }
+                            Token::Float(f) => byte_codes.push(load_const(
+                                &mut constants,
+                                (locals.len() + 1),
+                                Value::Float(f),
+                            )),
                             Token::Nil => {
-                                byte_codes.push(ByteCode::LoadNil(1));
+                                byte_codes.push(ByteCode::LoadNil((locals.len() + 1) as u8));
                             }
-                            Token::True => byte_codes.push(ByteCode::LoadBool(1, true)),
-                            Token::False => byte_codes.push(ByteCode::LoadBool(1, false)),
+                            Token::True => {
+                                byte_codes.push(ByteCode::LoadBool((locals.len() + 1) as u8, true))
+                            }
+                            Token::False => {
+                                byte_codes.push(ByteCode::LoadBool((locals.len() + 1) as u8, false))
+                            }
                             _ => panic!("Expected something else"),
                         }
                         if let Token::ParR = lex.next() {
                         } else {
                             panic!("No closing paren")
                         }
-                        byte_codes.push(ByteCode::Call(1, 0));
+                        byte_codes.push(ByteCode::Call(locals.len() as u8, 1));
                     }
                     Token::String(s) => {
                         let src = add_const(&mut constants, Value::String(s));
-                        byte_codes.push(ByteCode::LoadConst(1, src as u8));
-                        byte_codes.push(ByteCode::Call(0, 1));
+                        byte_codes.push(ByteCode::LoadConst((locals.len() + 1) as u8, src as u8));
+                        byte_codes.push(ByteCode::Call(locals.len() as u8, 1));
                     }
                     _ => panic!("expected string"),
                 }

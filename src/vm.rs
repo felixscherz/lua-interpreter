@@ -8,6 +8,7 @@ pub struct ExeState<'a> {
     globals: HashMap<String, Value>,
     stack: Vec<Value>,
     output: &'a mut (dyn Write + 'a),
+    func_index: usize,
 }
 
 impl<'a> ExeState<'a> {
@@ -19,6 +20,7 @@ impl<'a> ExeState<'a> {
             globals,
             stack: Vec::new(),
             output,
+            func_index: 0,
         }
     }
 
@@ -53,7 +55,8 @@ impl<'a> ExeState<'a> {
                     self.set_stack(dst, v);
                 }
                 ByteCode::Call(func, _) => {
-                    let func = &self.stack[func as usize];
+                    self.func_index = func as usize;
+                    let func = &self.stack[self.func_index as usize];
                     if let Value::Function(f) = func {
                         f(self);
                     } else {
@@ -70,8 +73,8 @@ impl<'a> ExeState<'a> {
 }
 
 // "print" function in Lua's std-lib.
-// It supports only 1 argument and assumes the argument is at index:1 on stack.
+// It supports only 1 argument and assumes the argument is at func_index + 1 on stack.
 fn lib_print(state: &mut ExeState) -> i32 {
-    writeln!(state.output, "{:?}", state.stack[0]).unwrap();
+    writeln!(state.output, "{:?}", state.stack[state.func_index + 1]).unwrap();
     0
 }
