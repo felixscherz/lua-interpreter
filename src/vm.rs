@@ -78,3 +78,91 @@ fn lib_print(state: &mut ExeState) -> i32 {
     writeln!(state.output, "{:?}", state.stack[state.func_index + 1]).unwrap();
     0
 }
+
+#[cfg(test)]
+mod test {
+    use std::{
+        fs::File,
+        io::{self, Read, Seek, Write},
+    };
+
+    use tempfile::tempfile;
+
+    use crate::parser::load;
+
+    use super::ExeState;
+
+    fn prepare_file(code: &str) -> File {
+        let mut file = tempfile().unwrap();
+        file.write(code.as_bytes()).unwrap();
+        file.seek(io::SeekFrom::Start(0)).unwrap();
+        file
+    }
+
+    fn compare_output(output: &mut File, expected: &str) {
+        let mut buffer = String::new();
+        output.seek(io::SeekFrom::Start(0)).unwrap();
+        output.read_to_string(&mut buffer).unwrap();
+        assert_eq!(buffer, expected);
+    }
+
+    #[test]
+    fn test_hello_world() {
+        let mut file = prepare_file("print \"hello world!\"\n");
+        let mut output = tempfile().unwrap();
+        let proto = load(&mut file);
+
+        let mut vm = ExeState::new(&mut output);
+        vm.execute(&proto);
+
+        compare_output(&mut output, "hello world!\n");
+    }
+
+    #[test]
+    fn test_print_small_integer() {
+        let mut file = prepare_file("print(1)");
+        let mut output = tempfile().unwrap();
+        let proto = load(&mut file);
+
+        let mut vm = ExeState::new(&mut output);
+        vm.execute(&proto);
+
+        compare_output(&mut output, "1\n");
+    }
+
+    #[test]
+    fn parse_print_large_integer() {
+        let mut file = prepare_file("print(33000)");
+        let mut output = tempfile().unwrap();
+        let proto = load(&mut file);
+
+        let mut vm = ExeState::new(&mut output);
+        vm.execute(&proto);
+
+        compare_output(&mut output, "33000\n");
+    }
+
+    #[test]
+    fn parse_print_float() {
+        let mut file = prepare_file("print(1.5)");
+        let mut output = tempfile().unwrap();
+        let proto = load(&mut file);
+
+        let mut vm = ExeState::new(&mut output);
+        vm.execute(&proto);
+
+        compare_output(&mut output, "1.5\n");
+    }
+
+    #[test]
+    fn assign_local_variable_then_print() {
+        let mut file = prepare_file("local a = 1\nprint(a)");
+        let mut output = tempfile().unwrap();
+        let proto = load(&mut file);
+
+        let mut vm = ExeState::new(&mut output);
+        vm.execute(&proto);
+
+        compare_output(&mut output, "1\n");
+    }
+}
