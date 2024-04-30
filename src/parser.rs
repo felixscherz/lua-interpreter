@@ -71,7 +71,7 @@ pub fn load(stream: &mut File) -> ParseProto {
                             }
                             Token::Float(f) => byte_codes.push(load_const(
                                 &mut constants,
-                                (locals.len() + 1),
+                                locals.len() + 1,
                                 Value::Float(f),
                             )),
                             Token::Nil => {
