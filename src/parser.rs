@@ -32,7 +32,15 @@ pub fn load(stream: &mut File) -> ParseProto {
                     // looking up a name in the local variables the index of the name in the locals
                     // list indicates the stack position where the value can be copied from.
                     if let Token::Integer(i) = lex.next() {
-                        byte_codes.push(load_const(&mut constants, 0, Value::Integer(i)))
+                        if let Ok(smallint) = i16::try_from(i) {
+                            byte_codes.push(ByteCode::LoadInteger(locals.len() as u8, smallint));
+                        } else {
+                            byte_codes.push(load_const(
+                                &mut constants,
+                                locals.len(),
+                                Value::Integer(i),
+                            ))
+                        }
                     } else {
                         panic!("Not implemented")
                     }
@@ -208,6 +216,9 @@ mod test {
     #[test]
     fn assign_variable() {
         let mut file = prepare_file("local a = 1\nprint(a)");
+
         let proto = load(&mut file);
+
+        assert_eq!(proto.constants, vec![Value::String("print".to_string())])
     }
 }
