@@ -19,6 +19,26 @@
 <a href="#18" id="18">18</a>
 <a href="#19" id="19">19</a>
 <a href="#20" id="20">20</a>
+<a href="#21" id="21">21</a>
+<a href="#22" id="22">22</a>
+<a href="#23" id="23">23</a>
+<a href="#24" id="24">24</a>
+<a href="#25" id="25">25</a>
+<a href="#26" id="26">26</a>
+<a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
+<a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
+<a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
+<a href="#37" id="37">37</a>
+<a href="#38" id="38">38</a>
+<a href="#39" id="39">39</a>
+<a href="#40" id="40">40</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
 <span class="kw">use </span><span class="kw">crate</span>::vm::ExeState;
@@ -28,6 +48,9 @@
     Nil,
     String(String),
     Function(<span class="kw">fn</span>(<span class="kw-2">&amp;mut </span>ExeState) -&gt; i32),
+    Integer(i64),
+    Float(f64),
+    Boolean(bool),
 }
 
 <span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Value {
@@ -36,6 +59,23 @@
             Value::Nil =&gt; <span class="macro">write!</span>(f, <span class="string">"nil"</span>),
             Value::String(s) =&gt; <span class="macro">write!</span>(f, <span class="string">"{s}"</span>),
             Value::Function(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(f, <span class="string">"function"</span>),
+            Value::Integer(i) =&gt; <span class="macro">write!</span>(f, <span class="string">"{i}"</span>),
+            Value::Float(v) =&gt; <span class="macro">write!</span>(f, <span class="string">"{v:?}"</span>),
+            Value::Boolean(b) =&gt; <span class="macro">write!</span>(f, <span class="string">"{b}"</span>),
+        }
+    }
+}
+
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>Value {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="kw">match </span>(<span class="self">self</span>, other) {
+            (Value::Boolean(a), Value::Boolean(b)) =&gt; a == b,
+            (Value::Nil, Value::Nil) =&gt; <span class="bool-val">true</span>,
+            (Value::String(a), Value::String(b)) =&gt; a == b,
+            (Value::Function(a), Value::Function(b)) =&gt; std::ptr::eq(a, b),
+            (Value::Integer(a), Value::Integer(b)) =&gt; a == b,
+            (Value::Float(a), Value::Float(b)) =&gt; a == b,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 }

@@ -352,6 +352,31 @@
 <a href="#351" id="351">351</a>
 <a href="#352" id="352">352</a>
 <a href="#353" id="353">353</a>
+<a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
+<a href="#356" id="356">356</a>
+<a href="#357" id="357">357</a>
+<a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
+<a href="#360" id="360">360</a>
+<a href="#361" id="361">361</a>
+<a href="#362" id="362">362</a>
+<a href="#363" id="363">363</a>
+<a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::{
     fmt::Debug,
     io::{Read, Seek, SeekFrom},
@@ -571,10 +596,13 @@
         <span class="kw">let </span><span class="kw-2">mut </span>word = String::new();
         <span class="kw">loop </span>{
             <span class="kw">let </span>c = <span class="self">self</span>.read_char();
-            <span class="kw">if </span>c == <span class="string">' ' </span>{
-                <span class="kw">break</span>;
+            <span class="kw">match </span>c {
+                <span class="string">'A'</span>..=<span class="string">'Z' </span>| <span class="string">'a'</span>..=<span class="string">'z' </span>| <span class="string">'_' </span>=&gt; word.push(c),
+                <span class="kw">_ </span>=&gt; {
+                    <span class="self">self</span>.seek(-<span class="number">1</span>);
+                    <span class="kw">break</span>;
+                }
             }
-            word.push(c);
         }
         <span class="kw">match </span>word.as_str() {
             <span class="string">"and" </span>=&gt; Token::And,
@@ -703,6 +731,28 @@
         <span class="macro">assert_eq!</span>(lexer.next(), Token::Integer(<span class="number">5</span>));
         <span class="macro">assert_eq!</span>(lexer.next(), Token::Add);
         <span class="macro">assert_eq!</span>(lexer.next(), Token::Integer(<span class="number">5</span>));
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_parse_printing_integers() {
+        <span class="kw">let </span>code = <span class="string">"print(1)"</span>.to_string();
+        <span class="kw">let </span><span class="kw-2">mut </span>cursor = Cursor::new(code);
+        <span class="kw">let </span><span class="kw-2">mut </span>lexer = Lexer::new(<span class="kw-2">&amp;mut </span>cursor);
+        <span class="macro">assert_eq!</span>(lexer.next(), Token::Name(<span class="string">"print"</span>.to_string()));
+        <span class="macro">assert_eq!</span>(lexer.next(), Token::ParL);
+        <span class="macro">assert_eq!</span>(lexer.next(), Token::Integer(<span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(lexer.next(), Token::ParR);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_parse_printing_floats() {
+        <span class="kw">let </span>code = <span class="string">"print(1.5)"</span>.to_string();
+        <span class="kw">let </span><span class="kw-2">mut </span>cursor = Cursor::new(code);
+        <span class="kw">let </span><span class="kw-2">mut </span>lexer = Lexer::new(<span class="kw-2">&amp;mut </span>cursor);
+        <span class="macro">assert_eq!</span>(lexer.next(), Token::Name(<span class="string">"print"</span>.to_string()));
+        <span class="macro">assert_eq!</span>(lexer.next(), Token::ParL);
+        <span class="macro">assert_eq!</span>(lexer.next(), Token::Float(<span class="number">1.5</span>));
+        <span class="macro">assert_eq!</span>(lexer.next(), Token::ParR);
     }
 }
 </code></pre></div></section></main></body></html>
