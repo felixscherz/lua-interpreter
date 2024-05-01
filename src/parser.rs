@@ -19,6 +19,8 @@ pub fn load(stream: &mut File) -> ParseProto {
 
     loop {
         match lex.next() {
+            // TODO: maybe parsing can be done on a higher level than tokens. Try to distinguish
+            // different cases, like assignments to local variables and function calls
             Token::Local => match lex.next() {
                 Token::Name(name) => {
                     // add name to local variables then parse the expression that follows the =
