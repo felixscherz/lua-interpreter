@@ -52,7 +52,9 @@ pub fn load(stream: &mut File) -> ParseProto {
                 // `Name LiteralString` as function call
                 // Push function name to the constants
                 let src = add_const(&mut constants, Value::String(name));
-                // Push instructions to get function name from constants and push to stack at 0
+                // Push instructions to get function name from constants and push to stack at
+                // `locals.len()` which points to the first free stack position after local
+                // variables
                 byte_codes.push(ByteCode::GetGlobal(locals.len() as u8, src as u8));
                 match lex.next() {
                     Token::ParL => {
