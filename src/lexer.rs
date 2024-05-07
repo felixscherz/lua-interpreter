@@ -1,6 +1,7 @@
 use std::{
     fmt::Debug,
     io::{Read, Seek, SeekFrom},
+    mem,
 };
 
 #[derive(Debug, PartialEq)]
@@ -82,18 +83,34 @@ impl<T> SeekRead for T where T: Seek + Read + Debug {}
 #[derive(Debug)]
 pub struct Lexer<'a> {
     stream: &'a mut (dyn SeekRead + 'a),
+    /// store next token for parsing purposes
+    ahead: Token,
 }
 
 impl<'a> Lexer<'a> {
     pub fn new(stream: &'a mut (dyn SeekRead + 'a)) -> Self {
-        Self { stream }
+        Self {
+            stream,
+            ahead: Token::Eos,
+        }
     }
 
     fn seek(&mut self, n: i64) {
         self.stream.seek(SeekFrom::Current(n)).unwrap();
     }
 
+    /// return the current ahead token and then parse the next one
     pub fn next(&mut self) -> Token {
+        // the initial value will be Token::Eos -> parse the next into self.ahead
+        if self.ahead == Token::Eos {
+            self.do_next()
+        } else {
+            let token = self.do_next();
+            mem::replace(&mut self.ahead, token)
+        }
+    }
+
+    fn do_next(&mut self) -> Token {
         let c = self.read_char();
         match c {
             '\0' => Token::Eos,
@@ -274,6 +291,10 @@ impl<'a> Lexer<'a> {
             '\0' // null-byte signifies end of file
         }
     }
+
+    // pub fn peek(&mut self) -> &Token {
+    //
+    // }
 }
 
 #[cfg(test)]
