@@ -292,9 +292,9 @@ impl<'a> Lexer<'a> {
         }
     }
 
-    // pub fn peek(&mut self) -> &Token {
-    //
-    // }
+    pub fn peek(&mut self) -> &Token {
+        &self.ahead
+    }
 }
 
 #[cfg(test)]
