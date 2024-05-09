@@ -84,14 +84,14 @@ impl<T> SeekRead for T where T: Seek + Read + Debug {}
 pub struct Lexer<'a> {
     stream: &'a mut (dyn SeekRead + 'a),
     /// store next token for parsing purposes
-    ahead: Token,
+    ahead: Option<Token>,
 }
 
 impl<'a> Lexer<'a> {
     pub fn new(stream: &'a mut (dyn SeekRead + 'a)) -> Self {
         Self {
             stream,
-            ahead: Token::Eos,
+            ahead: None,
         }
     }
 
@@ -102,11 +102,11 @@ impl<'a> Lexer<'a> {
     /// return the current ahead token and then parse the next one
     pub fn next(&mut self) -> Token {
         // the initial value will be Token::Eos -> parse the next into self.ahead
-        if self.ahead == Token::Eos {
+        if self.ahead == None {
             self.do_next()
         } else {
             let token = self.do_next();
-            mem::replace(&mut self.ahead, token)
+            mem::replace(&mut self.ahead, Some(token)).unwrap()
         }
     }
 
@@ -292,8 +292,8 @@ impl<'a> Lexer<'a> {
         }
     }
 
-    pub fn peek(&mut self) -> &Token {
-        &self.ahead
+    pub fn peek(&mut self) -> Option<&Token> {
+        self.ahead.as_ref()
     }
 }
 
